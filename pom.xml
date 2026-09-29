@@ -102,6 +102,14 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- 本机无 MySQL 服务时用 H2(MySQL 兼容模式) 跑端到端集成测试；
+             真实环境仍走 MySQL（仅 test 作用域，不进产物） -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>2.3.232</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

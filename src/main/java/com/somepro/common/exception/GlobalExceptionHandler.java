@@ -2,11 +2,13 @@ package com.somepro.common.exception;
 
 import com.somepro.common.Result;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.codec.DecodingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 
 /**
@@ -31,6 +33,17 @@ public class GlobalExceptionHandler {
         FieldError error = e.getFieldErrors().stream().findFirst().orElse(null);
         String msg = error == null ? "参数校验失败" : error.getDefaultMessage();
         log.warn("参数校验失败 field={} msg={}", error == null ? "-" : error.getField(), msg);
+        return Mono.just(Result.fail(msg));
+    }
+
+    /** 请求体缺失/格式错（JSON 解析失败、@RequestBody 必传缺失等）：回统一业务失败结构。 */
+    @ExceptionHandler(ServerWebInputException.class)
+    public Mono<Result<Void>> handleInput(ServerWebInputException e) {
+        Throwable cause = e.getCause();
+        String msg = (cause instanceof DecodingException)
+                ? "请求体格式有误（不是合法 JSON 或字段类型不对）"
+                : "请求参数有误：" + e.getReason();
+        log.warn("请求入参解析失败：{}", e.getMessage());
         return Mono.just(Result.fail(msg));
     }
 

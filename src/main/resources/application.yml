@@ -22,6 +22,9 @@ mybatis-plus:
     db-config:
       # ID 由应用层用雪花算法分配（见仓储适配器），与实体上的 IdType.INPUT 保持一致
       id-type: input
+      # 更新只改非 null 字段：改档案时未传的字段保持原值（部分更新），
+      # 避免“只改个电话却把场址等没传的字段抹成 null”。
+      update-strategy: not_null
 
 # ---------- PageHelper 分页 ----------
 # 注意：分页只认 PageHelper，不要再注册 MyBatis-Plus 的 PaginationInnerInterceptor（见 MybatisPlusConfig）
